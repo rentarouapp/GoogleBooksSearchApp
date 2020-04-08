@@ -40,6 +40,7 @@ class SearchResultTableViewController: UITableViewController {
          // APIをリクエストする
          request(requestUrl: requestUrl)
     }
+    
 
     // リクエストを行う処理の定義
     func request(requestUrl: String) {
@@ -48,6 +49,9 @@ class SearchResultTableViewController: UITableViewController {
             // URL生成失敗
             return
         }
+        
+        //UI更新以外の処理
+        DispatchQueue.global().async {
         // リクエスト生成
         let request = URLRequest(url: url)
         // 商品検索APIをコールして商品検索を行う
@@ -61,10 +65,12 @@ class SearchResultTableViewController: UITableViewController {
                 let alert = UIAlertController(title: "エラー",
                                               message: error?.localizedDescription,
                                               preferredStyle: UIAlertController.Style.alert)
+                
                 // UIに関する処理をメインスレッドで行う
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)
                 }
+                
                 return
             }
             // JSONで返却されたデータをパースして格納する
@@ -90,7 +96,7 @@ class SearchResultTableViewController: UITableViewController {
             } catch let error {
                 print("## error: \(error)")
             }
-            // テーブルの描画処理を実施
+            // テーブルの描画処理（UIに関する処理）をメインスレッドで行う
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -98,6 +104,8 @@ class SearchResultTableViewController: UITableViewController {
         // 通信開始
         task.resume()
     }
+    
+}
     // MARK: - Table view data source
     
     //テーブルビューのセクション数の設定
@@ -150,6 +158,9 @@ class SearchResultTableViewController: UITableViewController {
             return cell
         }
         
+        //UI更新以外の処理
+        DispatchQueue.global().async {
+        
         //画像のリクエストに関する処理
         let request = URLRequest(url: url)
         let session = URLSession.shared
@@ -179,6 +190,8 @@ class SearchResultTableViewController: UITableViewController {
         
         //通信開始
         task.resume()
+            
+    }
         //完成したセルを返す
         return cell
     }
